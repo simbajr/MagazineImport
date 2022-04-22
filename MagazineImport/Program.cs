@@ -20,7 +20,7 @@ namespace MagazineImport
                 {
                     //Insert your importers here
                     new PrenaxImporter(),
-                    //new MyNewCustomImporter(),
+                    new BerbImporter(),
                 };
 
                 try

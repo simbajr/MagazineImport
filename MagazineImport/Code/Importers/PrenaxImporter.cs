@@ -55,13 +55,6 @@ namespace MagazineImport.Code.Importers
                     var dt = wb.ExportDataTableFullFixed(true);
                     offers = dt.AsEnumerable().Select(dr => (IMagazineMapper)new PrenaxMapper(dr, Path.GetFileName(strFullFileName))).ToList();
                 }
-
-                ////TEST
-                //foreach (var offer in offers)
-                //{
-                //     Log.Logger?.Information("{0}, in: {1}, out: {2}, curr: {3}", offer.ProductName, offer.InPrice, offer.Price, offer.CurrencyId);
-                //}
-
                 //Import
                 bitReturn &= base.ImportToDatabase(offers);
 
@@ -92,24 +85,23 @@ namespace MagazineImport.Code.Importers
         private int _id = 0;
         public override int Id { get { return _id; } set { _id = value; } }
         public override string ImportJobId { get { return "Prenax" + _importJobSuffix; } }
-        public override string ExternalId { get { return Convert.ToString(Field("ProductId")); } }
-        public override string Issn { get { return Convert.ToString(Field("ISSN")); } }
-        public override string ProductName { get { return Convert.ToString(Field("Title")); } }
-        public override string Description { get { return Convert.ToString(Field("Description")); } }
-        //public override string FirstIssue { get { return Convert.ToString(Field("DeliveryTime")).Replace("veckor", " ").Trim(); } }
+        public override string ExternalId { get { return StringField("ProductId"); } }
+        public override string Issn { get { return StringField("ISSN"); } }
+        public override string ProductName { get { return StringField("Title"); } }
+        public override string Description { get { return StringField("Description"); } }
         public override string FirstIssue { get { return "4-14"; } }
-        public override int FreqPerYear { get { return Convert.ToInt32(Convert.ToString(Field("Frequency")) != "NULL" && !string.IsNullOrEmpty(Convert.ToString(Field("Frequency"))) ? Field("Frequency") : 0); } }
-
-        public override string ExternalOfferId { get { return Convert.ToString(Field("DeliveryOptionId")); } }
-        public override string CountryName { get { return Convert.ToString(Field("PublisherCountry")); } }
-        public override string OfferIdPrepaid { get { return Convert.ToString(Field("DeliveryOptionId")); } }
-        public override string CampaignIdPrepaid { get { return Convert.ToString(Field("DeliveryOption")); } }
+        public override int FreqPerYear { get { return Convert.ToInt32(Convert.ToString(Field("Frequency")) != "NULL" 
+            && !string.IsNullOrEmpty(Convert.ToString(Field("Frequency"))) ? Field("Frequency") : 0); } }
+        public override string ExternalOfferId { get { return StringField("DeliveryOptionId"); } }
+        public override string CountryName { get { return StringField("PublisherCountry"); } }
+        public override string OfferIdPrepaid { get { return StringField("DeliveryOptionId"); } }
+        public override string CampaignIdPrepaid { get { return StringField("DeliveryOption"); } }
         public override int SubscriptionLength 
         { 
             get
             {
                 int length;
-                if (int.TryParse(Convert.ToString(Field("OfferLength")), out length))
+                if (int.TryParse(StringField("OfferLength"), out length))
                     return length;
             
                 return 0;
@@ -150,6 +142,13 @@ namespace MagazineImport.Code.Importers
 
                 return 1;
             }
+        }
+
+        private string StringField(string s)
+        {
+            var result = Convert.ToString(Field(s));
+
+            return result;
         }
     }
 }
